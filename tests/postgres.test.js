@@ -106,7 +106,7 @@ test('HTTP pages, asset delivery, CSRF and borrowing/return flow', async () => {
   assert.equal((await fetch(`${origin}/equipment/edit?id=999999`)).status, 404);
   assert.equal((await fetch(`${origin}/database-export.sql`)).status, 404);
 });
-test('production refuses missing credentials and requires workspace password', async () => {
+test('production requires a CSRF secret and serves public pages without a password', async () => {
   const guarded = createApp(() => db, { NODE_ENV: 'production' }).listen(0, '127.0.0.1');
   await new Promise(resolve => guarded.once('listening', resolve));
   try { assert.equal((await fetch(`http://127.0.0.1:${guarded.address().port}/`)).status, 503); }
@@ -115,8 +115,10 @@ test('production refuses missing credentials and requires workspace password', a
   await new Promise(resolve => protectedApp.once('listening', resolve));
   try {
     const url = `http://127.0.0.1:${protectedApp.address().port}/`;
-    assert.equal((await fetch(url)).status, 401);
-    assert.equal((await fetch(url, { headers: { authorization: 'Basic ' + Buffer.from('labtrack:a-long-test-password').toString('base64') } })).status, 200);
+    const response = await fetch(url);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('www-authenticate'), null);
+    assert.equal((await fetch(url, { headers: { authorization: 'Basic ' + Buffer.from('old:cached-password').toString('base64') } })).status, 200);
   } finally { await new Promise(resolve => protectedApp.close(resolve)); }
 });
 

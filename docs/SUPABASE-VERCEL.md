@@ -11,7 +11,6 @@ The ignored `.env` has been created with your project URI and generated app secr
 ```dotenv
 DATABASE_URL=postgresql://postgres.PROJECT_REF:ENCODED_PASSWORD@POOLER_HOST:6543/postgres?sslmode=verify-full
 SESSION_SECRET=YOUR_RANDOM_SECRET_AT_LEAST_32_CHARACTERS
-LAB_APP_PASSWORD=YOUR_WORKSPACE_PASSWORD_AT_LEAST_16_CHARACTERS
 ```
 
 Generate separate random values locally with:
@@ -29,7 +28,7 @@ npm ci
 npm run db:migrate
 ```
 
-The migration creates an isolated `labtrack` schema, foreign keys, constraints, indexes, and RLS. Keep this schema out of the Supabase Data API exposed schemas. No anonymous or authenticated API policies are granted because all queries run on the protected server.
+The migration creates an isolated `labtrack` schema, foreign keys, constraints, indexes, and RLS. Keep this schema out of the Supabase Data API exposed schemas. No anonymous or authenticated API policies are granted because all queries run on the server.
 
 On the original migration machine, the current MySQL export has been saved locally in ignored `migration-data/mysql-export.json`. If MySQL records change before cutover, pause writes in the PHP application and refresh it:
 
@@ -55,7 +54,7 @@ npm test
 npm run dev
 ```
 
-Open `http://localhost:3000`. The workspace username is `labtrack`; the password is `LAB_APP_PASSWORD`. Without a password, local development is accessible only through the loopback listener. Production refuses to serve the app until both secrets meet their minimum lengths.
+Open `http://localhost:3000`. Pages and inventory forms are public and do not require a password. Production requires a `SESSION_SECRET` of at least 32 characters for CSRF tokens.
 
 An optional disposable preview can run before Supabase is configured:
 
@@ -75,13 +74,12 @@ Import the repository into Vercel and select the Express framework if detection 
 
 - `DATABASE_URL`
 - `SESSION_SECRET`
-- `LAB_APP_PASSWORD`
 
-For an isolated preview environment, use a separate database so preview changes cannot alter production inventory. Deploy only after migrating and importing the target database. Sign in with username `labtrack`, check counts against the source export, and verify a borrow/return transaction. Application secrets are configured separately on Vercel and must never be committed.
+For an isolated preview environment, use a separate database so preview changes cannot alter production inventory. Deploy only after migrating and importing the target database. Check counts against the source export, and verify a borrow/return transaction. Application secrets are configured separately on Vercel and must never be committed.
 
 ## Verified locally
 
-`npm test` passes 10 test groups against embedded PostgreSQL (PGlite), covering schema security, borrowing/returns, validation, linked-record protection, rollback after a forced second-write failure, status/date/search filters, CRUD, HTML escaping, HTTP form flow, CSRF, production access protection, and transactional import/sequence reset/overwrite refusal.
+`npm test` passes 10 test groups against embedded PostgreSQL (PGlite), covering schema security, borrowing/returns, validation, linked-record protection, rollback after a forced second-write failure, status/date/search filters, CRUD, HTML escaping, HTTP form flow, CSRF, password-free production access, and transactional import/sequence reset/overwrite refusal.
 
 The actual MySQL export also imports into the disposable PostgreSQL preview: **9 students, 4 categories, 10 equipment records, 10 borrowings**. The initial preview shows **86 total units, 78 available units and 5 active loans**. These are the current database values, rather than the older sample dataset.
 

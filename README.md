@@ -14,17 +14,17 @@ npm run db:import
 npm run dev
 ```
 
-Open http://localhost:3000. Workspace username: `labtrack`; password: `LAB_APP_PASSWORD` from your environment.
+Open http://localhost:3000. The application opens directly without signing in.
 
 ```powershell
 npm test
 ```
 
-Ten PostgreSQL/HTTP test groups cover inventory integrity, transactions and rollback, CRUD, filters, CSRF, access protection, and data import. Schema and current records have been migrated to the new Supabase project Labora (hddxljyqyfisjceioyhk). The ignored .env is configured, and live database connectivity has been verified.
+Ten PostgreSQL/HTTP test groups cover inventory integrity, transactions and rollback, CRUD, filters, CSRF, public access, and data import. Schema and current records have been migrated to the new Supabase project Labora (hddxljyqyfisjceioyhk). The ignored .env is configured, and live database connectivity has been verified.
 
 ## Source layout
 
-- `src/app.js`: Express entry point for Vercel; protected routes and form handling.
+- `src/app.js`: Express entry point for Vercel; public routes and form handling.
 - `src/domain.js`: prepared PostgreSQL queries, validation and atomic borrowing/return operations.
 - `src/views.js`: HTML rendering using the original visual design.
 - `src/db.js`: small serverless connection pool and transaction helper.
@@ -35,4 +35,4 @@ Ten PostgreSQL/HTTP test groups cover inventory integrity, transactions and roll
 
 The existing PHP files, SQL dumps, original tests and screenshots remain as legacy references. Their original documentation is in [docs/LEGACY-PHP.md](docs/LEGACY-PHP.md). They are not the Vercel runtime. MySQL was exported read-only and remains unchanged. Real credentials and the current export are ignored by Git.
 
-The protected server connects directly to PostgreSQL. The private `labtrack` schema is not exposed through the Supabase Data API; no browser database credentials are used. Production requires `DATABASE_URL`, `SESSION_SECRET` (32+ characters), and `LAB_APP_PASSWORD` (16+ characters).
+The server connects directly to PostgreSQL. The private `labtrack` schema is not exposed through the Supabase Data API; no browser database credentials are used. Production requires `DATABASE_URL`, `SESSION_SECRET` (32+ characters).

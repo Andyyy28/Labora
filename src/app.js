@@ -13,12 +13,7 @@ export function createApp(dbProvider = database, settings = process.env) {
   const secret = settings.SESSION_SECRET || (production ? '' : randomBytes(32).toString('hex'));
   app.use((req, res, next) => {
     res.set({ 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Referrer-Policy': 'same-origin' });
-    if (production && (!secret || secret.length < 32 || !settings.LAB_APP_PASSWORD || settings.LAB_APP_PASSWORD.length < 16)) return res.status(503).send('Set SESSION_SECRET (32+ characters) and LAB_APP_PASSWORD (16+ characters) before deploying.');
-    if (settings.LAB_APP_PASSWORD) {
-      const auth = req.headers.authorization || '';
-      const decoded = auth.startsWith('Basic ') ? Buffer.from(auth.slice(6), 'base64').toString() : '';
-      if (!equal(decoded, `labtrack:${settings.LAB_APP_PASSWORD}`)) return res.set('WWW-Authenticate', 'Basic realm="LabTrack", charset="UTF-8"').status(401).send('Sign in to your laboratory workspace.');
-    }
+    if (production && (!secret || secret.length < 32)) return res.status(503).send('Set SESSION_SECRET (32+ characters) before deploying.');
     next();
   });
   app.use('/assets', express.static(fileURLToPath(new URL('../public/assets', import.meta.url))));
