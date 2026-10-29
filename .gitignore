@@ -1,0 +1,23 @@
+node_modules/
+.env*
+!.env.example
+.vercel/
+supabase/.temp/
+migration-data/
+submission/
+*.log
+# Original XAMPP version and local assignment artifacts.
+/assets/
+/borrowings/
+/categories/
+/equipment/
+/includes/
+/students/
+/screenshots/
+/database*.sql
+/db.php
+/index.php
+/.htaccess
+/TEST_RESULTS.md
+/tests/*.php
+/tests/*.cjs

@@ -1,0 +1,13 @@
+node_modules
+.env*
+migration-data
+submission
+screenshots
+tests
+*.php
+includes
+students
+categories
+equipment
+borrowings
+database*.sql
